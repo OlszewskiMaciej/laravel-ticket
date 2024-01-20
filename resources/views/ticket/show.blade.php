@@ -1,0 +1,29 @@
+<x-app-layout>
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
+        <h1 class="text-white text-lg font-bold">{{ $ticket->title }}</h1>
+        <div class="w-full sm:max-w-xl mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+
+            <div class="text-white py-4">
+                <p class="py-4">{{$ticket->title}}</p>
+                <p class="py-4">{{$ticket->description}}</p>
+                <p class="py-4">{{$ticket->created_at}}</p>
+
+                @if($ticket->attachment)
+                <a href="{{'/storage/'.$ticket->attachment}}" target="_blank" class="py-4">Attachment</a>
+                @endif
+
+            </div>
+
+            <div class="text-white flex justify-between py-4">
+                <a href="{{route('ticket.edit', $ticket->id)}}">
+                    <x-primary-button>Edit</x-primary-button>
+                </a>
+
+                <form action="{{route('ticket.destroy', $ticket->id)}}" method="post">
+                    @method('delete')
+                    @csrf
+                    <x-primary-button>Delete</x-primary-button>
+                </form>
+            </div>
+        </div>
+</x-app-layout>
