@@ -14,16 +14,38 @@
 
             </div>
 
-            <div class="text-white flex justify-between py-4">
-                <a href="{{route('ticket.edit', $ticket->id)}}">
-                    <x-primary-button>Edit</x-primary-button>
-                </a>
+            <div class="flex justify-between">
+                <div class="flex">
+                    <a href="{{route('ticket.edit', $ticket->id)}}">
+                        <x-primary-button>Edit</x-primary-button>
+                    </a>
 
-                <form action="{{route('ticket.destroy', $ticket->id)}}" method="post">
-                    @method('delete')
-                    @csrf
-                    <x-primary-button>Delete</x-primary-button>
-                </form>
+                    <form action="{{ route('ticket.destroy', $ticket->id) }}" method="post">
+                        @method('delete')
+                        @csrf
+                        <x-primary-button>Delete</x-primary-button>
+                    </form>
+                </div>
+
+                @if(auth()->user()->isAdmin)
+                <div class="flex">
+                    <form action="{{ route('ticket.update', $ticket->id) }}" method="post">
+                        @method('patch')
+                        @csrf
+                        <div class="flex items-center mb-4">
+                            <select name="status" id="status" class="border rounded">
+                                <option value="open" {{ $ticket->status == 'Open' ? 'selected' : '' }}>Open</option>
+                                <option value="resolved" {{ $ticket->status == 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                <option value="rejected" {{ $ticket->status == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                            <x-primary-button type="submit">Update Status</x-primary-button>
+                        </div>
+                    </form>
+                </div>
+                @else
+                <p class="text-white">Status: {{ $ticket->status }}</p>
+                @endif
             </div>
         </div>
+    </div>
 </x-app-layout>

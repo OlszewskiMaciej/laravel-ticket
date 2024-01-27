@@ -11,16 +11,18 @@
                 </x-primary-button>
             </div>
 
-            @foreach ($tickets as $ticket)
+            @forelse ($tickets as $ticket)
 
             <div class="text-white flex justify-between py-4">
                 <a href="{{route('ticket.show', $ticket->id)}}">{{$ticket->title}}</a>
                 <p>{{$ticket->created_at->diffForHumans()}}</p>
             </div>
 
-            @endforeach
+            @empty
 
-            {{ $tickets->links() }}
+            <p class="text-white flex justify-center py-4">You don't have any support ticket yet.</p>
+
+            @endforelse
 
         </div>
 </x-app-layout>
