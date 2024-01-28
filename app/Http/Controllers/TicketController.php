@@ -18,7 +18,7 @@ class TicketController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $tickets = $user->isAdmin ? Ticket::latest()->get() : $user->tickets;
+        $tickets = $user->role == 'admin' ? Ticket::latest()->get() : $user->tickets;
 
         // return view('ticket.index', ['tickets' => $tickets]);
         return view('ticket.index', compact('tickets'));
