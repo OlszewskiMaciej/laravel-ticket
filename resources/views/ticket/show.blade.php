@@ -46,6 +46,29 @@
                 <p class="text-white">Status: {{ $ticket->status }}</p>
                 @endif
             </div>
+
+            <div class="text-white py-4">
+                <h2 class="text-lg font-semibold">Comments</h2>
+                @forelse($ticket->comments as $comment)
+                <div class="bg-gray-200 p-2 rounded my-2">
+                    <p class="text-gray-200">{{ $comment->content }}</p>
+                    <p class="text-xs text-gray-400">Commented by {{ $comment->user->name }} on {{ $comment->created_at }}</p>
+                </div>
+                @empty
+                <div class="bg-gray-200 p-2 rounded my-2">
+                    <p class="text-gray-200">No comments</p>
+                </div>
+                @endforelse
+
+                <form action="{{ route('comment.store') }}" method="post" class="mt-4">
+                    @csrf
+                    <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
+                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                    <x-textarea placeholder="Add a comment..." name="content" id="content" value="" />
+                    <x-primary-button type="submit">Add Comment</x-primary-button>
+                </form>
+
+            </div>
         </div>
     </div>
 </x-app-layout>
