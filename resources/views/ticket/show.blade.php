@@ -60,6 +60,7 @@
                 </div>
                 @endforelse
 
+                @if($ticket->status == 'open')
                 <form action="{{ route('comment.store') }}" method="post" class="mt-4">
                     @csrf
                     <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
@@ -67,6 +68,7 @@
                     <x-textarea placeholder="Add a comment..." name="content" id="content" value="" />
                     <x-primary-button type="submit">Add Comment</x-primary-button>
                 </form>
+                @endif
 
             </div>
         </div>
