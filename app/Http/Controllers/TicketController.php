@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
-use App\Models\User;
 use App\Notifications\TicketUpdatedNotification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,7 +17,12 @@ class TicketController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $tickets = $user->role == 'admin' ? Ticket::latest()->get() : $user->tickets;
+
+        if ($user->role == 'admin') {
+            $tickets = Ticket::latest()->get();
+        } else {
+            $tickets = $user->tickets->sortByDesc('created_at');
+        }
 
         // return view('ticket.index', ['tickets' => $tickets]);
         return view('ticket.index', compact('tickets'));
