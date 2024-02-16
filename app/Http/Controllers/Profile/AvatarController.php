@@ -4,22 +4,21 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAvatarRequest;
-use Illuminate\Support\Facades\Storage;
+use App\Services\AvatarService;
 
 class AvatarController extends Controller
 {
+    protected $avatarService;
+
+    public function __construct(AvatarService $avatarService)
+    {
+        $this->avatarService = $avatarService;
+    }
+
     public function update(UpdateAvatarRequest $request)
     {
-        //$path = Storage::disk('public')->put('avatars', $request->file('avatar'));
-        $path = $request->file('avatar')->store('avatars', 'public');
+        $this->avatarService->updateAvatar($request->user(), $request->file('avatar'));
 
-        if ($request->user()->avatar) {
-            Storage::delete('/public/' . $request->user()->avatar);
-        }
-
-        auth()->user()->update(['avatar' => $path]);
-
-        //return response()->redirectTo(route('profile.edit'));
         return back()->with('message', 'Avatar is changed.');
     }
 }
