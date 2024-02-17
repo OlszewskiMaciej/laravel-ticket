@@ -5,26 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
-use App\Notifications\TicketUpdatedNotification;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Services\TicketService;
 
 class TicketController extends Controller
 {
+    protected $ticketService;
+
+    public function __construct(TicketService $ticketService)
+    {
+        $this->ticketService = $ticketService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $user = auth()->user();
+        $tickets = $this->ticketService->getTickets(auth()->user());
 
-        if ($user->role == 'admin') {
-            $tickets = Ticket::latest()->get();
-        } else {
-            $tickets = $user->tickets->sortByDesc('created_at');
-        }
-
-        // return view('ticket.index', ['tickets' => $tickets]);
         return view('ticket.index', compact('tickets'));
     }
 
@@ -41,15 +39,7 @@ class TicketController extends Controller
      */
     public function store(StoreTicketRequest $request)
     {
-        $ticket = Ticket::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'user_id' => auth()->id(),
-        ]);
-
-        if ($request->file('attachment')) {
-            $this->storeAttachment($request, $ticket);
-        }
+        $this->ticketService->createTicket($request);
 
         return redirect(route('ticket.index'));
     }
@@ -75,23 +65,7 @@ class TicketController extends Controller
      */
     public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        $ticket->update($request->except('attachment'));
-
-        if ($request->has('status')) {
-            $ticket->update(['status' => $request->status]);
-            // $user = User::find($ticket->user_id);
-            $ticket->user->notify(new TicketUpdatedNotification($ticket));
-
-            // return (new TicketUpdatedNotification($ticket))->toMail($user);
-        }
-
-        if ($request->file('attachment')) {
-            if ($ticket->attachment) {
-                Storage::disk('public')->delete($ticket->attachment);
-            }
-
-            $this->storeAttachment($request, $ticket);
-        }
+        $this->ticketService->updateTicket($request, $ticket);
 
         return redirect(route('ticket.show', $ticket->id));
     }
@@ -101,24 +75,8 @@ class TicketController extends Controller
      */
     public function destroy(Ticket $ticket)
     {
-        if ($ticket->attachment) {
-            Storage::disk('public')->delete($ticket->attachment);
-        }
-
-        $ticket->delete();
+        $this->ticketService->deleteTicket($ticket);
 
         return redirect(route('ticket.index'));
-    }
-
-    protected function storeAttachment($request, $ticket)
-    {
-        $extension = $request->file('attachment')->extension();
-        $contents = file_get_contents($request->file('attachment'));
-        $filename = Str::random(25);
-        $path = "attachments/$filename.$extension";
-
-        Storage::disk('public')->put($path, $contents);
-
-        $ticket->update(['attachment' => $path]);
     }
 }
