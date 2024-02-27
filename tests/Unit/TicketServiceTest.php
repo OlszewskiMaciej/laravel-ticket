@@ -102,7 +102,6 @@ class TicketServiceTest extends TestCase
 
     public function test_update_ticket_with_new_attachment()
     {
-        Storage::fake('public');
         $user = User::factory()->create();
         $ticket = Ticket::factory()->create(['user_id' => $user->id]);
 
@@ -122,7 +121,6 @@ class TicketServiceTest extends TestCase
         $this->assertEquals($requestData['description'], $updatedTicket->description);
 
         Storage::disk('public')->assertMissing($oldAttachmentPath);
-
         Storage::disk('public')->assertExists($updatedTicket->attachment);
     }
 

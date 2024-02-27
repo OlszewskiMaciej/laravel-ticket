@@ -16,7 +16,7 @@ class TicketComment extends Model
         'ticket_id'
     ];
 
-    public function user(): belongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
