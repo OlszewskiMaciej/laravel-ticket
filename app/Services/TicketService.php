@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Ticket;
-use App\Notifications\TicketUpdatedNotification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Events\TicketUpdated;
 
 class TicketService
 {
@@ -37,7 +37,7 @@ class TicketService
 
         if ($request->has('status')) {
             $ticket->update(['status' => $request->status]);
-            $ticket->user->notify(new TicketUpdatedNotification($ticket));
+            event(new TicketUpdated($ticket));
         }
 
         if ($request->file('attachment')) {
