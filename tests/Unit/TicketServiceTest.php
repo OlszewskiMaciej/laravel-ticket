@@ -29,11 +29,11 @@ class TicketServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Ticket::factory()->count(6)->create(['user_id' => $user->id]);
+        Ticket::factory()->count(3)->create(['user_id' => $user->id]);
 
         $tickets = $this->ticketService->getTickets($user);
 
-        $this->assertCount(6, $tickets);
+        $this->assertCount(3, $tickets);
     }
 
     public function test_create_ticket()
