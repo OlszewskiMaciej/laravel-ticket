@@ -42,29 +42,3 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_TEST_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_TEST_PASSWORD }}
         run: php artisan test
-
-  laravel-deploy:
-    name: Deploy to Server
-    needs: laravel-tests
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: SSH Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_PROD_HOST }}
-          username: ${{ secrets.SERVER_PROD_USERNAME }}
-          key: ${{ secrets.SERVER_PROD_SSH_KEY }}
-          port: ${{ secrets.SERVER_PROD_PORT }}
-          script: |
-            cd ${{ secrets.SERVER_PROD_PATH }}
-            git pull origin main
-            composer install --no-dev
-            npm install --production
-            php artisan migrate
-            php artisan optimize
-            npm run build
